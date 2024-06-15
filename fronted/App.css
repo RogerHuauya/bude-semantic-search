@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  .header {
+    background-color: #007bff;
+    padding: 20px;
+    color: white;
+    text-align: center;
+  }
+  
+  .header a {
+    color: white;
+    text-decoration: none;
+    margin: 0 20px; /* Ajusta este valor para agregar más o menos espacio */
+  }
+  
+  .header a.active {
+    font-weight: bold;
+  }
+  
+  .content {
+    padding: 20px;
+  }
+  
