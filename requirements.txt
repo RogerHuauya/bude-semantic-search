@@ -7,10 +7,12 @@ django-filter
 django-storages==1.13.2
 pillow
 python-dotenv
+nltk
+pandas
+numpy
 boto3==1.26.59
 gunicorn==20.1.0
 psycopg2-binary==2.9.6
 drf-yasg
-dj_database_url
 dj_database_url
 flake8

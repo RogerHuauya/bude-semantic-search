@@ -2,6 +2,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.postgres.search import SearchQuery, SearchRank
+from .custom_inverted_index import InvertedIndex
 from .models import Song
 
 
@@ -39,6 +40,7 @@ class CustomSearchAPIView(APIView):
         query = request.GET.get('query', '')
         k = int(request.GET.get('k', 10))
 
+        InvertedIndex()
         if not query:
             return Response({"error": "Query parameter is required"},
                             status=status.HTTP_400_BAD_REQUEST)
