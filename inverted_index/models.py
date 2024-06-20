@@ -17,3 +17,13 @@ class Song(models.Model):
         indexes = [
             GinIndex(fields=['search_vector']),
         ]
+
+
+class IndexFile(models.Model):
+    block_number = models.IntegerField()
+    height = models.IntegerField()
+    file = models.FileField(upload_to='blocks/')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Block {self.block_number}, Height {self.height}"
