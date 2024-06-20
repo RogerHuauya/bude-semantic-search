@@ -12,7 +12,7 @@ COPY package-lock.json ./
 
 RUN npm install
 RUN npm install -g serve
-
+RUN npm install axios
 # Bundle app source
 COPY . ./
 

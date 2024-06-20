@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
+import axios from "axios"
 import './Query.css';
 
 const Query = () => {
     const [query, setQuery] = useState('');
     const [topK, setTopK] = useState('');
     const [selectedOption, setSelectedOption] = useState('');
-    const [result, setResult] = useState('');
+    const [result, setResult] = useState([]);
   
     const handleInputChange = (event) => {
       setQuery(event.target.value);
@@ -22,7 +23,20 @@ const Query = () => {
     const handleSubmit = (event) => {
       event.preventDefault();
       // Aquí puedes agregar la lógica para manejar la consulta
-      setResult(`Resultado para: ${query} con top K = ${topK} y opción seleccionada = ${selectedOption}`);
+      if( topK == '' | topK < 1){setTopK(1)}
+      var tmp =''
+      if(selectedOption == "postgres"){tmp = 'postgres-search';}
+      else if(selectedOption == "custom"){tmp = 'custom-search';}
+      let url = "http://localhost:8000/inverted-index/"+tmp+"/?query=%27"+query+"%27&k="+topK
+      
+      axios.get(url)
+      .then(response => {
+          setResult(response.data);
+      })
+      .catch(error => {
+        setResult([]);
+      })
+      // setResult(`Resultado para: ${query} con top K = ${topK} y opción seleccionada = ${selectedOption}`);
     };
   
   return (
@@ -45,13 +59,27 @@ const Query = () => {
             />
             <select value={selectedOption} onChange={handleSelectChange}>
               <option value="" disabled>Metodo de Indexacion</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              <option value="postgres">Postgres</option>
+              <option value="custom">Custom</option>
             </select>
           </div>
         </form>
-        {result && <div className="result">{result}</div>}
+        <div className="result">
+            {result.length > 0 ? (
+              result.map((item, index) => (
+                <div key={index} className="result-item">
+                  <p><strong>Track ID:</strong> {item.track_id}</p>
+                  <p><strong>Track Name:</strong> {item.track_name}</p>
+                  <p><strong>Track Artist:</strong> {item.track_artist}</p>
+                  <p><strong>Lyrics:</strong> {item.lyrics}</p>
+                  <p><strong>Rank:</strong> {item.rank}</p>
+                </div>
+              ))
+            ) : (
+              <p>No results found</p>
+            )}
+          </div>
+        {/* {result && <div className="result">{result}</div>} */}
       </div>
     </div>
   );

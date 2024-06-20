@@ -18,12 +18,11 @@ const Home = () => {
                 <div className="team">
                     <h2>Integrantes</h2>
                     <ul>
-                        <li>Integrante 1</li>
-                        <li>Integrante 2</li>
-                        <li>Integrante 3</li>
-                        <li>Integrante 4</li>
-                        <li>Integrante 5</li>
-                        <li>Integrante 6</li>
+                        <li>Roger Huauya Mamani</li>
+                        <li>Arturo Barrantes Chuquimia</li>
+                        <li>Angello Soldi Cataño</li>
+                        <li>Rodrigo León Chumpitaz</li>
+                        <li>Joel Jimenez Condori</li>
                     </ul>
                     <img src={teamImage} alt="Team" className="team-image"/>
                 </div>
