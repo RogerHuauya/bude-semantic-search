@@ -1,9 +1,11 @@
 import os
-import shutil
+import requests
+
 from django.core.management.base import BaseCommand
 from django.core.files import File
 from audio.models import Audio
 import audio.utils as utils
+from tqdm import tqdm
 
 
 class Command(BaseCommand):
@@ -12,6 +14,16 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         AUDIO_DIR = os.environ.get('AUDIO_DIR', 'fma_small')
         csv_file = 'tracks.csv'
+
+        if not os.path.exists(csv_file):
+            print("Downloading CSV file")
+            url = "https://storage.googleapis.com/rogers-bucket/tracks.csv"
+            response = requests.get(url, stream=True)
+            total_size = int(response.headers.get('content-length', 0))
+
+            with open(csv_file, 'wb') as f:
+                for data in tqdm(response.iter_content(1024), total=total_size//1024, unit='KB'):
+                    f.write(data)
 
         tracks = utils.load(csv_file)
         small_tracks = tracks[tracks['set', 'subset'] <= 'small'][:5]

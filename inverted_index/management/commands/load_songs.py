@@ -1,6 +1,10 @@
 import csv
+import os
+import requests
+
 from django.core.management.base import BaseCommand
 from inverted_index.models import Song
+from tqdm import tqdm
 
 
 class Command(BaseCommand):
@@ -12,6 +16,17 @@ class Command(BaseCommand):
 
         songs_to_create = []
         songs_to_update = []
+
+        # check if csv exist else download from url
+        if not os.path.exists(csv_file):
+            print("Downloading CSV file")
+            url = "https://storage.googleapis.com/rogers-bucket/spotify_songs.csv"
+            response = requests.get(url, stream=True)
+            total_size = int(response.headers.get('content-length', 0))
+
+            with open(csv_file, 'wb') as f:
+                for data in tqdm(response.iter_content(1024), total=total_size//1024, unit='KB'):
+                    f.write(data)
 
         with open(csv_file, newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
