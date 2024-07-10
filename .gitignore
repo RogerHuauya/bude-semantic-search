@@ -162,3 +162,6 @@ cython_debug/
 .idea/
 
 media/
+fma_small/
+
+*.csv

@@ -1,7 +1,7 @@
 import csv
 from django.core.management.base import BaseCommand
-from django.db import transaction
 from inverted_index.models import Song
+
 
 class Command(BaseCommand):
     help = 'Load songs from a CSV file into the database'
@@ -15,7 +15,8 @@ class Command(BaseCommand):
 
         with open(csv_file, newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
-            existing_songs = {song.track_id: song for song in Song.objects.all()}
+            existing_songs = {song.track_id: song for song in
+                              Song.objects.all()}
             for row in reader:
                 song_data = {
                     'track_id': row['track_id'],
@@ -33,17 +34,23 @@ class Command(BaseCommand):
                     songs_to_create.append(Song(**song_data))
 
                 if len(songs_to_create) >= batch_size:
-                    Song.objects.bulk_create(songs_to_create, batch_size=batch_size)
+                    Song.objects.bulk_create(songs_to_create,
+                                             batch_size=batch_size)
                     songs_to_create = []
 
                 if len(songs_to_update) >= batch_size:
-                    Song.objects.bulk_update(songs_to_update, ['track_name', 'track_artist', 'lyrics'], batch_size=batch_size)
+                    Song.objects.bulk_update(songs_to_update,
+                                             ['track_name', 'track_artist',
+                                              'lyrics'], batch_size=batch_size)
                     songs_to_update = []
 
         # Create or update any remaining songs
         if songs_to_create:
             Song.objects.bulk_create(songs_to_create, batch_size=batch_size)
         if songs_to_update:
-            Song.objects.bulk_update(songs_to_update, ['track_name', 'track_artist', 'lyrics'], batch_size=batch_size)
+            Song.objects.bulk_update(songs_to_update,
+                                     ['track_name', 'track_artist', 'lyrics'],
+                                     batch_size=batch_size)
 
-        self.stdout.write(self.style.SUCCESS('Successfully loaded songs from CSV'))
+        self.stdout.write(
+            self.style.SUCCESS('Successfully loaded songs from CSV'))

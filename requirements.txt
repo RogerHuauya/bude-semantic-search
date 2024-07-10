@@ -16,3 +16,5 @@ psycopg2-binary==2.9.6
 drf-yasg
 dj_database_url
 flake8
+librosa
+pydot

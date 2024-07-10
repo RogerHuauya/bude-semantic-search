@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'web',
     'inverted_index',
+    'audio',
 ]
 
 MIDDLEWARE = [
