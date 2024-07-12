@@ -9,7 +9,7 @@ pillow
 python-dotenv
 nltk
 pandas
-numpy
+numpy==1.26.4
 boto3==1.26.59
 gunicorn==20.1.0
 psycopg2-binary==2.9.6
@@ -18,3 +18,4 @@ dj_database_url
 flake8
 librosa
 pydot
+pgvector

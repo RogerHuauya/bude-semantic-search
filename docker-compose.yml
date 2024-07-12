@@ -12,7 +12,7 @@ services:
     tty: true
   db:
     container_name: bude_db_dev
-    image: postgres:14
+    image: ankane/pgvector:latest
     ports:
       - "5432:5432"
     environment:
