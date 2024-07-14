@@ -23,6 +23,7 @@ urlpatterns = [
     path('', include('web.urls')),
     path('inverted-index/', include('inverted_index.urls')),
     path('audio/', include('audio.urls')),
+    path('image/', include('image.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL,
