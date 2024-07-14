@@ -42,7 +42,7 @@ const Query = () => {
   return (
     <div className="query-container">
       <div className="main-content">
-        <h2>Consult</h2>
+        <h2>Query</h2>
         <form onSubmit={handleSubmit}>
           <textarea
             value={query}
@@ -50,18 +50,22 @@ const Query = () => {
             placeholder="Enter your natural language consult"
           />
           <div className="form-footer">
-            <button type="submit">Execute</button>
             <input
               type="number"
               value={topK}
               onChange={handleTopKChange}
               placeholder="top K"
             />
-            <select value={selectedOption} onChange={handleSelectChange}>
-              <option value="" disabled>Metodo de Indexacion</option>
-              <option value="postgres">Postgres</option>
-              <option value="custom">Custom</option>
-            </select>
+            <div className='selector'>
+              <select value={selectedOption} onChange={handleSelectChange}>
+                <option value="" disabled>Metodo de Indexacion</option>
+                <option value="postgres">Postgres</option>
+                <option value="custom">Custom</option>
+              </select>
+            </div>
+            <div className='boton-execute'>
+              <button type="submit">Execute</button>
+            </div>
           </div>
         </form>
         <div className="result">
