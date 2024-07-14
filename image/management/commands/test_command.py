@@ -38,35 +38,3 @@ class Command(BaseCommand):
         nearest_ids = BudeRtree.top_k_nearest(query_embedding, 3)
 
         print(f"Top 3 nearest neighbors to image 0: {nearest_ids}")
-
-        print("Done!")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # # Insertar los embeddings en el R-tree
-        # for item in var:
-        #     rtree.insert(item['id'], item['vector'])
-        
-        # # Realizar una consulta
-        # query_random = Image.objects.all()[765:766]  # Obtener un solo punto de consulta
-        # for img in query_random:
-        #     query_point = img.embedding[:100]
-
-        # result = rtree.top_k_nearest(query_point, k=3)
-        # print("IDs de los top 3 embeddings cercanos:", result)
