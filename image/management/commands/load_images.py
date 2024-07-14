@@ -3,11 +3,11 @@ import requests
 import pandas as pd
 
 from django.core.management.base import BaseCommand
-from django.core.files import File
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from image.models import Image
 from tqdm import tqdm
 import io
+
 
 class Command(BaseCommand):
     help = 'Load image files and data from a CSV file into the database'
@@ -23,7 +23,8 @@ class Command(BaseCommand):
             total_size = int(response.headers.get('content-length', 0))
 
             with open(csv_file, 'wb') as f:
-                for data in tqdm(response.iter_content(1024), total=total_size//1024, unit='KB'):
+                for data in tqdm(response.iter_content(1024),
+                                 total=total_size // 1024, unit='KB'):
                     f.write(data)
 
         styles = pd.read_csv(csv_file, on_bad_lines='warn')
