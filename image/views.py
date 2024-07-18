@@ -8,12 +8,15 @@ from pgvector.django import CosineDistance
 
 from .models import Image
 from .serializers import ImageSerializer, ImageQuerySerializer
+from .custom_rtree import XRtree
 
 model_ckpt = "harshp8l/Fashion-Product-Images"
 processor = AutoImageProcessor.from_pretrained(model_ckpt)
 model = AutoModel.from_pretrained(model_ckpt)
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model.to(device)
+
+bude_tree = XRtree()
 
 
 def extract_features(image_file):
@@ -45,3 +48,21 @@ class ImageModelViewSet(viewsets.ModelViewSet):
             return Response(response_serializer.data,
                             status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RtreeAPIView(viewsets.ViewSet):
+    @action(detail=False, methods=['post'], url_path='insert')
+    def insert(self, request):
+        images = Image.objects.all()[:5]
+        bude_tree.batch_insert(images)
+        return Response(status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='search')
+    def search(self, request):
+        query_image = request.data['query_image']
+        query_embedding = extract_features(query_image)
+        similar_ids = bude_tree.top_k_nearest(query_embedding, 5)
+        similar_images = Image.objects.filter(id__in=similar_ids)
+        response_serializer = ImageSerializer(similar_images, many=True)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
+
