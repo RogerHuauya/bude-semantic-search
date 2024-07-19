@@ -67,7 +67,7 @@ class XRtree:
             distance = self.euclidean_distance(transformed_point, embedding)
             if len(nearest) < k:
                 heapq.heappush(nearest, (-distance, id))
-            else:
+            elif distance < -nearest[0][0]:
                 heapq.heappushpop(nearest, (-distance, id))
 
         return [id for _, id in sorted(nearest, reverse=True)]
