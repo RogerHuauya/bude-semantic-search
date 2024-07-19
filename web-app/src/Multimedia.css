@@ -149,14 +149,22 @@
  .bye {
   margin-top: 5px;
   margin-left: 10px;
- }
+  margin-top: 10px;
+}
 
 
 
+.side-image-container {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+}
 
-
-
-
+.side-image1 {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
 
 
 

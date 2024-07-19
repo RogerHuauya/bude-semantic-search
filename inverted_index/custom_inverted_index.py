@@ -35,8 +35,8 @@ class InvertedIndex:  # Clase que representa el índice invertido
         self.df: Dict[str, int] = defaultdict(int)  # Frecuencia de documentos
         self.n_blocks: int = 0  # Número de bloques
         self.block_size_list: List[int] = []  # Lista de tamaños de los bloques
-        #self.build_index(index_col, lang)  # Construir el índice invertido
-        #self.compute_doc_norms()  # Compute and save document norms
+        self.build_index(index_col, lang)  # Construir el índice invertido
+        self.compute_doc_norms()  # Compute and save document norms
 
     def build_index(self, index_col: str, lang: str) -> None:
         read_path = os.path.join(data_dir, self.file_name)
@@ -67,135 +67,28 @@ class InvertedIndex:  # Clase que representa el índice invertido
         with open(os.path.join(data_dir, 'block_sizes.json'), 'w', encoding='utf-8') as file:
             json.dump(self.block_size_list, file, indent=4)
         self.n_blocks = i
-        self.merge_blocks()
+        self.merge_split()
         self.compute_idf(num_documents)
 
-    def merge_blocks(self) -> None:
-        self.mergesort(1, self.n_blocks)
+    def merge_split(self) -> None:
+        total_index: Dict[str, Dict[str, int]] = {}
+        for i in range(1, self.n_blocks+1):
+            block_index, _ = self.load_block(i)
+            total_index.update(block_index)
 
-    def mergesort(self, p: int, r: int) -> int:
-        if p > r:
-            return -1
-        if p == r:
-            return 0
-        q = (p + r) // 2
-        left_h: int = self.mergesort(p, q)
-        right_h: int = self.mergesort(q + 1, r)
-        h: int = max(left_h, right_h) + 1
-        self.merge(p, q, r, h)
-        return h
+        sorted_keys = sorted(total_index.keys())
+        total_index_ordered = {k: total_index[k] for k in sorted_keys}
+        total_keys = len(sorted_keys)
+        part_size = total_keys // self.n_blocks
+        remaining = total_keys % self.n_blocks
 
-    def merge(self, p: int, q: int, r: int, height: int) -> None:
-        nl: int = q - p + 1
-        nr: int = r - q
+        start_index = 0
+        for i in range(1, self.n_blocks+1):
+            end_index = start_index + part_size + (1 if i < remaining else 0)
+            part_keys = sorted_keys[start_index:end_index]
+            self.write_block({k: total_index_ordered[k] for k in part_keys}, i, 1)
+            start_index = end_index
 
-        i_ext: int = 0
-        j_ext: int = 0
-
-        while i_ext < nl and j_ext < nr:
-            if not self.block_exists(p + i_ext, height) or not self.block_exists(q + j_ext, height):
-                # print(f"Skipping merge for blocks {p + i_ext} and {q + j_ext} at height {height}")
-                return
-
-            d1, blockl_k, blockl_v, sizel = self.load_block(block_num=p + i_ext, height=height)
-            d2, blockr_k, blockr_v, sizer = self.load_block(block_num=q + j_ext, height=height)
-            new_block: Dict[str, Dict[str, int]] = self.merge_dicts(d1, d2)
-
-            split_size = (sizel + sizer) // 2
-            block1, block2 = self.split_dict(new_block, split_size)
-
-            self.write_block(block1, p + i_ext, height + 1)
-            self.write_block(block2, q + j_ext, height + 1)
-
-            i_ext += 1
-            j_ext += 1
-
-        while i_ext < nl:
-            if not self.block_exists(p + i_ext, height):
-                print(f"Skipping block {p + i_ext} at height {height}")
-                return
-
-            d1, blockl_k, blockl_v, sizel = self.load_block(p + i_ext, height)
-            self.write_block(d1, p + i_ext, height + 1)
-            i_ext += 1
-
-        while j_ext < nr:
-            if not self.block_exists(q + j_ext, height):
-                print(f"Skipping block {q + j_ext} at height {height}")
-                return
-
-            d2, blockr_k, blockr_v, sizer = self.load_block(q + j_ext, height)
-            self.write_block(d2, q + j_ext, height + 1)
-            j_ext += 1
-
-    def block_exists(self, block_num: int, height: int) -> bool:
-        block_path = os.path.join(blocks_dir, f"block_{block_num}__height_{height}.json")
-        return os.path.exists(block_path)
-
-    def merge_dicts(self, d1: Dict[str, Dict[str, int]], d2: Dict[str, Dict[str, int]]) -> Dict[str, Dict[str, int]]:
-        merged: Dict[str, Dict[str, int]] = {}
-        keys1: List[str] = list(d1.keys())
-        keys2: List[str] = list(d2.keys())
-
-        i, j = 0, 0
-        while i < len(keys1) and j < len(keys2):
-            if keys1[i] < keys2[j]:
-                merged[keys1[i]] = d1[keys1[i]]
-                i += 1
-            elif keys1[i] > keys2[j]:
-                merged[keys2[j]] = d2[keys2[j]]
-                j += 1
-            else:  # keys1[i] == keys2[j]
-                merged[keys1[i]] = {}
-                nested_keys1: List[str] = list(d1[keys1[i]].keys())
-                nested_keys2: List[str] = list(d2[keys1[i]].keys())
-
-                k, l = 0, 0
-                while k < len(nested_keys1) and l < len(nested_keys2):
-                    if nested_keys1[k] < nested_keys2[l]:
-                        merged[keys1[i]][nested_keys1[k]] = d1[keys1[i]][nested_keys1[k]]
-                        k += 1
-                    elif nested_keys1[k] > nested_keys2[l]:
-                        merged[keys1[i]][nested_keys2[l]] = d2[keys1[i]][nested_keys2[l]]
-                        l += 1
-                    else:  # nested_keys1[k] == nested_keys2[l]
-                        merged[keys1[i]][nested_keys1[k]] = d2[keys1[i]][nested_keys2[l]]
-                        k += 1
-                        l += 1
-
-                while k < len(nested_keys1):
-                    merged[keys1[i]][nested_keys1[k]] = d1[keys1[i]][nested_keys1[k]]
-                    k += 1
-
-                while l < len(nested_keys2):
-                    merged[keys1[i]][nested_keys2[l]] = d2[keys1[i]][nested_keys2[l]]
-                    l += 1
-
-                i += 1
-                j += 1
-
-        while i < len(keys1):
-            merged[keys1[i]] = d1[keys1[i]]
-            i += 1
-
-        while j < len(keys2):
-            merged[keys2[j]] = d2[keys2[j]]
-            j += 1
-
-        return merged
-
-    def split_dict(self, input_dict: Dict[str, Dict[str, int]], split_size: int) -> Tuple[Dict[str, Dict[str, int]], Dict[str, Dict[str, int]]]:
-        dict1 = {}
-        dict2 = {}
-        current_size = 0
-
-        for key, value in input_dict.items():
-            if current_size < split_size:
-                dict1[key] = value
-                current_size += len(value)
-            else:
-                dict2[key] = value
-        return dict1, dict2
 
     def write_block(self, block: Dict[str, Dict[str, int]], block_num: int, height: int) -> None:
         block_path = os.path.join(blocks_dir, f"block_{block_num}__height_{height}.json")
@@ -204,15 +97,13 @@ class InvertedIndex:  # Clase que representa el índice invertido
             json.dump(block, file, indent=4)
         print(f"Block {block_num} written successfully")  # Added for debugging
 
-    def load_block(self, block_num: int, height: int = 0) -> Tuple[Dict[str, Dict[str, int]], List[str], List[Dict[str, int]], int]:
+    def load_block(self, block_num: int, height: int = 0) -> Tuple[Dict[str, Dict[str, int]], int]:
         block_path = os.path.join(blocks_dir, f"block_{block_num}__height_{height}.json")
         print(f"Loading block from path: {block_path}")  # Added for debugging
         with open(block_path, 'r', encoding='utf-8') as file:
             block_index: Dict[str, Dict[str, int]] = json.load(file)
             docsizes: int = sum(len(posting) for posting in block_index.values())
-            keys: List[str] = list(block_index.keys())
-            values: List[Dict[str, int]] = list(block_index.values())
-        return block_index, keys, values, docsizes
+        return block_index, docsizes
 
     def compute_idf(self, num_documents: int) -> None:
         idf: Dict[str, float] = {}
@@ -313,7 +204,7 @@ class InvertedIndex:  # Clase que representa el índice invertido
 
         return cosine_similarities
 
-    def get_lyrics_from_doc_ids(doc_ids: List[int], file_name: str) -> List[str]:
+    def get_lyrics_from_doc_ids(self, doc_ids: List[int], file_name: str) -> List[str]:
         lyrics = []
         chunks: TextFileReader = pd.read_csv(os.path.join(data_dir, file_name), chunksize=1000, usecols=['id', 'lyrics'])
         for chunk in chunks:
