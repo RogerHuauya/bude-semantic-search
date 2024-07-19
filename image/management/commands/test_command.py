@@ -11,7 +11,7 @@ class Command(BaseCommand):
         print("Rtree with CPA!")
 
         # Obtener los primeros 10 registros de la base de datos
-        queryset = Image.objects.all()[:3000]
+        queryset = Image.objects.all()[:30]
         var = []
         for img in queryset:
             var.append({"title": img.title, "vector": img.embedding, "id": img.id})

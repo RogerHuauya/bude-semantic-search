@@ -49,12 +49,5 @@ class XRtree:
             raise ValueError(
                 f"Query point must be of dimension {self.dimensions}")
 
-        nearest = []
-        for id, embedding in self.id_map.items():
-            distance = self.euclidean_distance(transformed_point, embedding)
-            if len(nearest) < k:
-                heapq.heappush(nearest, (-distance, id))
-            else:
-                heapq.heappushpop(nearest, (-distance, id))
-
-        return [id for _, id in sorted(nearest, reverse=True)]
+        nearest = list(self.idx.nearest((*transformed_point, *transformed_point), k))
+        return nearest
