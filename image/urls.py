@@ -7,8 +7,12 @@ from . import views
 router = routers.DefaultRouter()
 
 router.register(r'image', views.ImageModelViewSet)
-router.register(r'rtree', views.RtreeAPIView, basename='rtree')
 
 urlpatterns = [
     path('', include(router.urls)),
+    path('pgvector/search/', views.ImageAPIView.as_view(),
+         name='image-search'),
+    path('rtree/search/', views.RtreeAPIView.as_view(), name='rtree-search'),
+    path('sequential/search/', views.SequentialAPIView.as_view(),
+         name='sequential-search'),
 ]

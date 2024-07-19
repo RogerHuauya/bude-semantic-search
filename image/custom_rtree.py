@@ -22,6 +22,9 @@ class XRtree:
         self.idx = index.Index(properties=p)
         return reduced_embeddings
 
+    def is_empty(self):
+        return self.idx is None
+
     def batch_insert(self, images: QuerySet[Image]):
         embeddings = np.array([img.embedding for img in images])
         ids = [img.id for img in images]
@@ -51,3 +54,20 @@ class XRtree:
 
         nearest = list(self.idx.nearest((*transformed_point, *transformed_point), k))
         return nearest
+
+    def top_k_nearest_sequential(self, point, k):
+        transformed_point = self.transform_pca(point)
+
+        if len(transformed_point) != self.dimensions:
+            raise ValueError(
+                f"Query point must be of dimension {self.dimensions}")
+
+        nearest = []
+        for id, embedding in self.id_map.items():
+            distance = self.euclidean_distance(transformed_point, embedding)
+            if len(nearest) < k:
+                heapq.heappush(nearest, (-distance, id))
+            else:
+                heapq.heappushpop(nearest, (-distance, id))
+
+        return [id for _, id in sorted(nearest, reverse=True)]

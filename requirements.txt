@@ -24,3 +24,4 @@ torch
 transformers
 pillow
 rtree
+django-debug-toolbar
