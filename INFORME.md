@@ -2,10 +2,14 @@
 
 ## Introducción
 ### Objetivo del Proyecto
-El objetivo de este proyecto es desarrollar y evaluar la implementación de un sistema de indexación eficiente utilizando tanto índices invertidos como índices multidimensionales. 
+El objetivo de este proyecto es entender y aplicar los algoritmos de búsqueda y recuperación de información basados en contenido. El proyecto se divide en dos partes: 
+1. Construcción óptima de un Índice Invertido para tareas de búsqueda y recuperación en documentos de texto.
+2. Construcción de una estructura multidimensional para dar soporte a la búsqueda y recuperación eficiente de imágenes y audio usando vectores característicos.
+
+Ambas implementaciones se aplicarán para mejorar la búsqueda en un sistema de recomendación.
 
 ### Descripción del Dominio de Datos y la Importancia de Aplicar Indexación
-El dominio de datos abarca grandes volúmenes de documentos textuales y datos multidimensionales que requieren un acceso rápido y eficiente. La aplicación de técnicas de indexación es crucial para mejorar el rendimiento de las consultas y optimizar el uso de recursos.
+El dominio de datos incluye grandes volúmenes de documentos textuales y objetos multimedia (imágenes y audio). La aplicación de técnicas de indexación es crucial para mejorar el rendimiento de las consultas y optimizar el uso de recursos. La indexación permite una búsqueda más rápida y eficiente, reduciendo significativamente el tiempo de respuesta y mejorando la precisión en la recuperación de información.
 
 ## Backend: Índice Invertido
 ### Construcción del Índice Invertido en Memoria Secundaria
