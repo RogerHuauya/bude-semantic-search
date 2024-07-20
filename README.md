@@ -1,6 +1,6 @@
 # BUDE Recommendation System
 
-This README provides instructions on how to set up the Django project,
+In the Wiki section you'll find the project report and the experimental video. This README provides instructions on how to set up the Django project,
 load songs from a CSV file into the database, update the search vectors, 
 run the required migrations, and configure the search API.
 
@@ -95,75 +95,4 @@ Both endpoints return a list of songs with the following fields:
 
 With these steps, you can set up your Django project, load song data, update the search vectors, and utilize the search API to perform efficient searches.
 
-### Report
-
-#### Introduction
-
-This project aims to understand and apply search and information retrieval algorithms based on content. 
-The project is divided into two parts: 
-a) optimal construction of an Inverted Index for text search and retrieval tasks and 
-b) construction of a multidimensional structure to support efficient search and
-retrieval of images/audio using characteristic vectors. 
-Both implementations will be applied to improve search in a recommendation system.
-
-#### Project Structure
-
-- `main.py`: Contains the implementation of the inverted index and the query logic.
-- `spotify_songs.csv`: CSV file with Spotify songs.
-- `blocks/`: Directory where partial blocks are stored.
-- `tf_idf.json`: JSON file with the IDF values for each term.
-- `doc_norms.json`: JSON file with the norms of the documents.
-
-#### Process Explanation
-
-#### Part 1: Construction of the Textual Inverted Index (Full-Text Search)
-
-##### Backend
-
-1. **Implementation of the inverted index using the ranking retrieval model for free-text queries.**
-    - **Preparation:**
-        - A dataset from Kaggle is used.
-    - **Preprocessing:**
-        - Tokenization
-        - Stopwords filtering
-        - Stemming
-    - **Index Construction:**
-        - Block Reading: Read the CSV file in blocks.
-        - Preprocessing: Tokenize, remove stopwords, and apply stemming.
-        - Partial Index: Create partial indices for each block.
-        - Block Writing: Save partial indices in JSON files.
-        - Merge Sort: Combine blocks into a single index.
-        - Calculate TF-IDF: Calculate and save TD-IDF.
-
-    - **Query:**
-        - Query Preprocessing: Tokenize and apply stemming.
-        - TF-IDF Calculation: Calculate TF-IDF for query terms.
-        - Retrieving Relevant Documents: Search for documents containing the query terms.
-        - Cosine Similarity Calculation: Compute cosine similarity between the query and relevant documents.
-        - Retrieve Song Lyrics: Retrieve the lyrics of the most relevant songs.
-        - The query is a natural language phrase.
-        - Scoring is obtained by applying cosine similarity on the inverted index in secondary memory.
-        - The retrieval function should return the top-k documents closest to the query.
-     
-    - **Cosine Similarity**
-
-The `compute_cosine_similarity` function calculates cosine similarities between a query and a set of documents. It first computes the query's norm and returns an empty list if the norm is zero. For each document, it calculates the dot product of term frequencies and the norms of both the query and document vectors. It then computes the cosine similarity by dividing the dot product by the product of the norms and appends the document ID and similarity score to a list. Finally, it returns this list of similarity scores.
-
-![Cosine Similarity](https://cdn.botpenguin.com/assets/website/Screenshot_2024_03_13_at_1_45_10_PM_8c008710ae.webp)
-
-### Experiment
-
-1. **Measure the performance of your implementation compared to PostgreSQL.**
-
-| N  | MyIndex (Time) | PostgreSQL |
-|----|----------------|-----------------------------|
-| 1000  |671.612 ms|    13.524 ms  |
-| 2000  |681.134 ms|    15.813 ms  |
-| 4000  |681.871 ms|    16.312 ms  |
-| 8000  |691.241 ms|    18.954 ms  |
-| 16000 |745.314 ms|    21.538 ms  |
-| 32000 |779.091 ms|    27.358 ms  |
-| 64000 |836.413 ms|    38.912 ms  |
-
-![Comparative Chart](images/img1.png)
 
